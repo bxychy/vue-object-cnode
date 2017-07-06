@@ -10,7 +10,7 @@
 				<li v-for="(article,index) in articleLists" class="art-li">
 					<!--第一行-->
 					<div class="list-first">
-						<router-link :to="{name:'user',params:{id:article.author.loginname}}" class="user-avatar">
+						<router-link :to="{params:{id:article.author.loginname}}" class="user-avatar">
 	                        <img :src="article.author.avatar_url" class="headpic"/>
 	                    </router-link>
 	                    <div class="list-time">
@@ -60,6 +60,9 @@
 			    },{
 			        tab:"ask",
 			        name:"问答",
+			    },{
+			        tab:"job",
+			        name:"招聘",
 			    }]
 			}
 		},

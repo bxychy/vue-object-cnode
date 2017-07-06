@@ -1,5 +1,5 @@
 <template>
-	<div class="article-detail">
+	<div class="article-detail" ref="articleDetail" @scroll="articleDetailTop($event)">
 		<!--标题信息-->
 		<div class="article-detail-title">
 			<div class="article-title">
@@ -63,6 +63,13 @@
         	</div>
         	
         </div>
+		<!--评论-->
+		<form class="article-comment">
+            <textarea v-model="articleCommentText" placeholder="输入回复内容"></textarea>
+            <input  :disabled="!articleCommentText.length" :class="{active:articleCommentText.length}" class="btn" value="提交">
+        </form>
+		<!--返回顶部-->
+		<div class="article-top" v-show="articleTop" @click="goTop">回到顶部</div>
 	</div>
 </template>
 
@@ -73,6 +80,8 @@
 				author:{},
 				topics:{},
 				replies:[],
+				articleTop:false,
+				articleCommentText:'',
 			}
 		},
 		created(){
@@ -85,7 +94,7 @@
 						
 		            }
 				}).then((data)=>{
-					console.log(data,this.$route.params.id)
+//					console.log(data,this.$route.params.id)
 					this.author = data.data.data.author;
 	             	this.topics = data.data.data;
 	             	this.replies = data.data.data.replies;
@@ -93,6 +102,24 @@
 	            	console.log(error);
 	         	})
 			},
+			articleDetailTop(event){
+//				console.log(event);
+	          	var e=event.target.scrollTop
+	          	if(e > 100) this.articleTop = true
+	          	else this.articleTop = false
+	       	},
+			goTop(){
+                var scrollTimer = setInterval(()=>{
+	              	var osTop = this.$refs.articleDetail.scrollTop;
+	              	var speed = Math.floor(-osTop/6)
+//	              	console.log(speed,osTop);
+	              	this.$refs.articleDetail.scrollTop = osTop + speed
+	              	if(osTop == 0){
+	                  	clearInterval(scrollTimer)
+	                  	this.articleTop = false
+	              	}
+          		})
+            }
 		},
 	}
 </script>
@@ -112,7 +139,7 @@
 	.article-detail .article-title .footer span:before,.article-detail .article-title .footer span.dot:after{content:"•";}
 	/*.article-detail .article-title .footer span.dot:after{position: absolute;top: 6px;right: -10px;content: "";display: block;width: 4px;height: 4px;border-radius: 50%;background: #999;}*/
 	
-	.article-content{margin: 10px auto;width: 100%;border-top: 1px solid #e5e5e5;}
+	.article-content{margin: 10px auto;width: 100%;}
 	blockquote{padding: 0 0 0 15px;margin: 0 0 20px;border-left: 5px solid #eee;font-size:14px;}
 	.markdown-text p{font-size: 15px;line-height: 1.7em;overflow: auto;margin:1em auto;}
 	.article-content ul{padding-left:20px;}
@@ -133,8 +160,12 @@
 	.article-reply .reply-content .reply-content-header .icon{flex-grow: 1;text-align: right;font-size:14px;}
 	.article-reply .reply-content .reply-content-header .icon span{margin: 0;}
 	.article-reply .reply-content .reply-content-header .icon span:last-child{margin-left: 10px;}
-	
 	.article-reply .reply-content .reply-content-content{padding: 4px 0;box-sizing: border-box;}
 
+	.article-top{width: 24px;color: gray;padding: 12px 0 12px 5px;display: block;position: fixed;cursor: pointer;text-align: center;z-index: 20;background-color: #fff;border-radius: 12px 0 0 12px;bottom:60px;right:0px;background-color: #f5f5f5;border: 1px solid #ccc;border-right: 0;}
 
+	.article-comment{position: fixed;bottom: 0;width: 100%;height: 32px;margin-left: -10px;display: -webkit-flex; /* Safari */display: flex;}
+	.article-comment textarea{flex-basis: 75%;height: 32px;width:75%;padding: 5px;box-sizing: border-box;border: 1px solid gainsboro;border-radius: 0;-webkit-tap-highlight-color: transparent;box-shadow: none;outline: none;resize: none;overflow: auto;}
+	.article-comment input{height:32px;flex-basis: 25%;width:25%;border: none;background: rgba(29, 146, 237, 0.5);color: #fff;border-radius: 0;-webkit-tap-highlight-color: transparent;text-align:center;}
+	.article-comment input.active{background: #1d92ed;color: #fff;}
 </style>

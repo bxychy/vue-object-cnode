@@ -13,14 +13,15 @@
 				changs:[{
 					name:'分享',
 					value:'share'
-				},
-				{
+				},{
 					name:'问答',
 					value:'ans'
-				},
-				{
+				},{
 					name:'招聘',
 					value:'job'
+				},{
+					name:'测试',
+					value:'dev'
 				}]
 			}
 		},

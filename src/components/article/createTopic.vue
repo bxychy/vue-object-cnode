@@ -9,7 +9,7 @@
 				</div>
 				<!--提交按钮-->
                 <div class="create-form-first-btn">
-                    <input :disabled="isDisabled" :class="{active:!isDisabled}" type="submit" value="提交">
+                    <input :disabled="isDisabled" :class="{active:!isDisabled}"  @click="addArticle" type="button" value="提交"></input>
                 </div>
 			</div>
 			<!--标题-->
@@ -33,6 +33,7 @@
 		data(){
 			return{
 				topics:{
+					accesstoken: sessionStorage.getItem("configToken"),
 					tab:'',
                 	title:'',
                 	content:''
@@ -67,6 +68,14 @@
          		if(this.topics.tab && this.topics.title.length>=10 && this.topics.content){
 	                this.isDisabled = false
 	           }
+         	},
+         	addArticle(){
+         		this.$http.post('/topics',this.topics).then((res)=>{
+	           		console.log(res,res.data.data);
+	           		this.$router.push({path:'/',query:{tab:'dev'}})
+	           	}).catch((error)=>{
+	                console.log(error)
+	            })
          	}
 		},
 		components:{

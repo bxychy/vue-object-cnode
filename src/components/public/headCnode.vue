@@ -13,6 +13,18 @@
                 <li v-for="(nav,index) in navs">
                     <router-link :to="nav.path" class="leder-a" tag="a">{{nav.name}}</router-link>
                 </li>
+                <li v-if="judgeLogin">
+                	<router-link to="/login" class="leder-a" tag="a" >登录</router-link>
+                </li>
+                <li v-if="!judgeLogin">
+                	<router-link to="/topic/create" class="leder-a" tag="a" >发布话题</router-link>
+                </li>
+                <li v-if="!judgeLogin">
+                	<router-link :to="{name:'userInfo',params:{loginname:loginName}}" class="leder-a" tag="a" >个人中心</router-link>
+                </li>
+                <li v-if="!judgeLogin">
+                	<router-link to="/message" class="leder-a" tag="a">消息中心</router-link>
+                </li>
             </ul>
         </div>
     </div>
@@ -25,15 +37,30 @@
 				navs: [{
 		        	path: '/',
 		          	name: '首页'
-		        }, {
-		          	path: '/topic/create',
-		          	name: '发布话题'
-		        }, {
-		          	path: '/my/message',
-		          	name: '消息通知'
-		        }]	
+//		        }, {
+//		          	path: '/topic/create',
+//		          	name: '发布话题'
+//		        }, {
+//		          	path: '/my/message',
+//		          	name: '消息通知'
+		        }],
+		        judgeLogin:true,
+		        loginName:'',
 			}
-		}
+		},
+		created(){
+//			if(sessionStorage.getItem('configToken')){
+//				this.judgeLogin=false;
+//			}
+			this.$root.eventHub.$on('judgeLogin', (msg)=>{
+				console.log(msg);
+				this.judgeLogin=false;
+				this.loginName=msg;
+			})
+		},
+		methods:{
+			
+		},
 	}
 </script>
 
