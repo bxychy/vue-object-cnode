@@ -130,6 +130,7 @@
 		              	this.$refs.articleDetail.scrollTop =  this.$refs.articleDetail.scrollHeight
 		          	}).catch((error)=>{
 		              	console.log(error)
+		              	this.$router.push({ path:'/login'});
 		          	})
 				}else{
 					if(this.articleCommentText){
@@ -144,6 +145,7 @@
 			              	this.$refs.articleDetail.scrollTop =  this.$refs.articleDetail.scrollHeight
 			          	}).catch((error)=>{
 			              	console.log(error)
+			              	this.$router.push({ path:'/login'});
 			          	})
 					}
 	          	}
