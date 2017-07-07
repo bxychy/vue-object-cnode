@@ -56,17 +56,24 @@
                     	{{reply.create_at | getTime}}
                     </div>
                     <div class="icon">
+		        		<span @click="replyUps(reply.id,$event)" class="iconfont icon-zan_light"></span>
 		        		<span>{{reply.ups.length}}</span>
+		            </div>
+		            <div class="addReply_icon">
+		            	<span class="iconfont icon-huifu1" @click="addReply(reply.id)" ></span>
 		            </div>
         		</div>
         		<div class="reply-content-content" v-html="reply.content"></div>
+        		<div class="reply-addReplyer" v-if="curReplyId === reply.id">
+	            	<textarea v-model="articleCommentText1" placeholder="输入回复内容"></textarea>
+	            	<a class="button" @click="addReply(reply.id,reply.author.loginname)">确定</a>
+	            </div>
         	</div>
-        	
         </div>
 		<!--评论-->
 		<form class="article-comment">
             <textarea v-model="articleCommentText" placeholder="输入回复内容"></textarea>
-            <input  :disabled="!articleCommentText.length" :class="{active:articleCommentText.length}" class="btn" value="提交">
+            <input  :disabled="!articleCommentText.length" :class="{active:articleCommentText.length}" class="btn" value="提交" @click="addReply()">
         </form>
 		<!--返回顶部-->
 		<div class="article-top" v-show="articleTop" @click="goTop">回到顶部</div>
@@ -82,6 +89,10 @@
 				replies:[],
 				articleTop:false,
 				articleCommentText:'',
+				articleCommentText1:'',
+//				addReplyer:false,
+				curReplyId:'',
+				contentName:'',
 			}
 		},
 		created(){
@@ -102,6 +113,58 @@
 	            	console.log(error);
 	         	})
 			},
+			addReply(id,name){
+				this.curReplyId = id;
+				this.contentName = `@${name} `;
+				console.log(this.articleCommentText1,id);
+				if(id && this.articleCommentText1 && this.contentName){
+					console.log('119',this.articleCommentText1,id,this.contentName);
+					this.$http.post(`/topic/${this.$route.params.id}/replies`,{
+		               accesstoken:sessionStorage.getItem("configToken"),
+		               content: this.articleCommentText1+this.contentName,
+		               reply_id:id,
+		          	}).then((res)=>{
+		              	this.articleCommentText1 = ''
+		              	this.getArticleDetail();
+		              	console.log(res.data)
+		              	this.$refs.articleDetail.scrollTop =  this.$refs.articleDetail.scrollHeight
+		          	}).catch((error)=>{
+		              	console.log(error)
+		          	})
+				}else{
+					if(this.articleCommentText){
+						console.log('133',this.articleCommentText);
+						this.$http.post(`/topic/${this.$route.params.id}/replies`,{
+			               accesstoken:sessionStorage.getItem("configToken"),
+			               content: this.articleCommentText
+			          	}).then((res)=>{
+			              	this.articleCommentText = ''
+			              	this.getArticleDetail();
+			              	console.log(res.data)
+			              	this.$refs.articleDetail.scrollTop =  this.$refs.articleDetail.scrollHeight
+			          	}).catch((error)=>{
+			              	console.log(error)
+			          	})
+					}
+	          	}
+	       	},
+	       	replyUps(id,event){
+	          	this.$http.post(`/reply/${id}/ups`,{
+	              accesstoken: sessionStorage.getItem("configToken"),
+	          	}).then((res) => {
+	             	if(res.data.action == 'up'){
+	                	event.target.classList.remove('icon-zan_light')
+	                	event.target.classList.add('icon-zan_fill')
+	             	}else if(res.data.action == 'down'){
+	                	event.target.classList.remove('icon-zan_fill')
+	                	event.target.classList.add('icon-zan_light')
+	             	}
+	             	this.getArticleDetail()
+	             	console.log(res.data)
+	          	}).catch((error)=>{
+	           		console.log(error)
+	          	})
+	       	},
 			articleDetailTop(event){
 //				console.log(event);
 	          	var e=event.target.scrollTop
@@ -149,19 +212,24 @@
 	.article-reply{border-top: 1px solid #999;width: 100%;padding-bottom: 32px;box-sizing: border-box;}
 	.article-reply span.reply-altogether{display: block;width: 100%;color: #666;margin: 5px auto;font-size: 14px;}
 	.article-reply .reply-content{width: 100%;border-bottom: 1px solid gainsboro;}
-	.article-reply .reply-content .reply-content-header{padding: 4px 0;box-sizing: border-box;width: 100%;display: flex;flex-flow: row nowrap;align-items: center;}
-	.article-reply .reply-content .reply-content-header .author-avatar{flex-grow: 0;width: 30px;height: 30px;text-align: center;line-height: 30px;border-radius: 50%;background: #f1f1f0;}
-	.article-reply .reply-content .reply-content-header .author-avatar img{width: 30px;height: 30px;border-radius: 50%;}
-	.article-reply .reply-content .reply-content-header .name{flex-grow: 0;margin-right: 10px;margin-left: 10px;font-size:14px;}
-	.article-reply .reply-content .reply-content-header .floor{flex-grow: 0;color:  #0088cc;font-size:14px;}
+	 .reply-content-header{padding: 4px 0;box-sizing: border-box;width: 100%;display: flex;flex-flow: row nowrap;align-items: center;}
+	 .reply-content-header .author-avatar{flex-grow: 0;width: 30px;height: 30px;text-align: center;line-height: 30px;border-radius: 50%;background: #f1f1f0;}
+	 .reply-content-header .author-avatar img{width: 30px;height: 30px;border-radius: 50%;}
+	 .reply-content-header .name{flex-grow: 0;margin-right: 10px;margin-left: 10px;font-size:14px;}
+	 .reply-content-header .floor{flex-grow: 0;color:  #0088cc;font-size:14px;}
 	/*.article-reply .reply-content .reply-content-header .floor:after{content:'';position: absolute;right:-8px;top:8px;background:  #0088cc;width: 5px;height: 5px;border-radius: 50%;}*/
-	.article-reply .reply-content .reply-content-header .floor:after{content:"•";}
-	.article-reply .reply-content .reply-content-header .time{flex-grow: 0;margin-left: 10px;color: #0088cc;font-size:14px;}
-	.article-reply .reply-content .reply-content-header .icon{flex-grow: 1;text-align: right;font-size:14px;}
-	.article-reply .reply-content .reply-content-header .icon span{margin: 0;}
-	.article-reply .reply-content .reply-content-header .icon span:last-child{margin-left: 10px;}
-	.article-reply .reply-content .reply-content-content{padding: 4px 0;box-sizing: border-box;}
-
+	 .reply-content-header .floor:after{content:"•";}
+	 .reply-content-header .time{flex-grow: 0;margin-left: 10px;color: #0088cc;font-size:14px;}
+	 .reply-content-header .icon{flex-grow: 1;text-align: right;font-size:14px;}
+	 .reply-content-header .addReply_icon{flex-grow: 0.2;font-size:14px;}
+	 .reply-content-header .icon span{margin: 0;}
+	 /*.reply-content-header .icon span:last-child{margin-left: 10px;}*/
+	 .reply-content-header .addReply_icon span{color:#000;opacity:.8;display: block;text-align: center;}
+	 .reply-content-content{padding: 4px 0;box-sizing: border-box;}
+	.reply-addReplyer{}
+	.reply-addReplyer textarea{display: block;width: 100%;flex: 1;border: 1px solid #d5dbdb;background-color: #fff;font-size: 14px;padding: 15px;color: #313131;}
+	.reply-addReplyer .button{display: inline-block;width: 20%;height: 35px;margin: 15px 0;line-height: 35px;color: #fff;font-size: 16px;background-color: #08c;border: none;text-align: center;vertical-align: middle;}
+	
 	.article-top{width: 24px;color: gray;padding: 12px 0 12px 5px;display: block;position: fixed;cursor: pointer;text-align: center;z-index: 20;background-color: #fff;border-radius: 12px 0 0 12px;bottom:60px;right:0px;background-color: #f5f5f5;border: 1px solid #ccc;border-right: 0;}
 
 	.article-comment{position: fixed;bottom: 0;width: 100%;height: 32px;margin-left: -10px;display: -webkit-flex; /* Safari */display: flex;}

@@ -95,7 +95,7 @@
 	
 	.user-info .info .user-bottom{background-color: #e7e7e7;width: 100%;margin-top: 20px;overflow: hidden;}
 	.user-info .info .user-bottom .user-time{width: 50%;float: left;}
-	.user-info .info .user-bottom .user-score{width: 50%;float: left;text-align: right;padding-right: 10px;color: #80bd01;}
+	.user-info .info .user-bottom .user-score{width: 45%;float: left;text-align: right;padding-right: 10px;color: #80bd01;}
 	
 	.topics-tabs{width: 100%;height: 41px;list-style: none;position: relative;}
 	.topics-img{width: 100%;margin: 10px 0;padding: 0 10px;display: flex;}
