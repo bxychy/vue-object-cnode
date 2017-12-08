@@ -1,4 +1,4 @@
-# vue-cnode ·ÂcnodeÖÐÎçÉçÇø
+# vue-object-cnode
 
 > A Vue.js project-https://zsychy.github.io/vue-object-cnode/
 
